@@ -13,6 +13,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
+using System.Windows;
 
 namespace VirtualClipBoard
 {
@@ -25,8 +26,8 @@ namespace VirtualClipBoard
         Dictionary<int, int> VirtualClipBoard_Index_ListBox; // список индексов в связки с ключами истории буфера
 
         // Подключение библиотек WIN
-        [DllImport("User32.dll")]
-        protected static extern int SetClipboardViewer(int hWndNewViewer);
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern bool ChangeClipboardChain(IntPtr hWndRemove, IntPtr hWndNewNext);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -38,7 +39,7 @@ namespace VirtualClipBoard
             InitializeComponent();
             load_configs();
 
-            nextClipboardViewer = (IntPtr)SetClipboardViewer((int)this.Handle);
+            nextClipboardViewer = (IntPtr)SetClipboardViewer((IntPtr)this.Handle);
 
             reload_tray(); // Обноавляемменю в трее
             reload_list_clipboard(); // Обновляем ListBox
@@ -124,30 +125,34 @@ namespace VirtualClipBoard
         // Вызов окна настроек
         private void menu_item_config(object sender, EventArgs e)
         {
-            ShowInTaskbar = true;
+            // ShowInTaskbar = true;
             Show();
+            WindowState = FormWindowState.Normal;
         }
 
         // Событие по клику на элемент контекстного меню в трее
         private void menu_item_click(object sender, EventArgs e)
         {
+            // Console.WriteLine((int)(sender as ToolStripMenuItem).Tag);
             Clipboard.SetText(VirtualClipBoard_History[(int)(sender as ToolStripMenuItem).Tag]);
         }
 
         // событие при клике мышкой по значку в трее
         private void _notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (ShowInTaskbar == true)
+            Console.WriteLine(WindowState);
+            if (WindowState == FormWindowState.Normal || WindowState == FormWindowState.Maximized)
             {
-                ShowInTaskbar = false;
+                // ShowInTaskbar = false;
                 Hide();
+                WindowState = FormWindowState.Minimized;
             }
             else
             {
-                ShowInTaskbar = true;
+                // ShowInTaskbar = true;
                 Show();
+                WindowState = FormWindowState.Normal;
             }
-
         }
 
         // Установка путей к файлам конфигурации и истории
@@ -322,26 +327,29 @@ namespace VirtualClipBoard
         protected override void OnClosing(CancelEventArgs e)
         {
             e.Cancel = true;
-            ShowInTaskbar = false;
+            //ShowInTaskbar = false;
             Hide();
+            WindowState = FormWindowState.Minimized;
         }
 
         // дескриптор окна
         private IntPtr nextClipboardViewer;
 
         // Константы
-        public const int WM_DRAWCLIPBOARD = 0x0308;
+        public const int WM_DRAWCLIPBOARD = 0x308;
         public const int WM_CHANGECBCHAIN = 0x030D;
 
         // Метод для реагирование на изменение вбуфере обмена и т.д.
         protected override void WndProc(ref Message m)
         {
+            // Console.WriteLine("WndProc");
             switch (m.Msg)
             {
                 case WM_DRAWCLIPBOARD:
                     {
                         ClipboardChanged();
-                        SendMessage(nextClipboardViewer, m.Msg, m.WParam, m.LParam);
+                        //Console.WriteLine("WM_DRAWCLIPBOARD ClipboardChanged();");
+                        SendMessage(nextClipboardViewer, WM_DRAWCLIPBOARD, m.WParam, m.LParam);
                         break;
                     }
                 case WM_CHANGECBCHAIN:
