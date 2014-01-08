@@ -164,7 +164,7 @@ namespace VirtualClipBoard
             Console.WriteLine("Размер истории загружен из настроек: " + Properties.Settings.Default.history_size);
             size_tray.Value = Properties.Settings.Default.size_tray;
             Console.WriteLine("Количество элементов в трее загружено из настроек: " + Properties.Settings.Default.size_tray);
-            RegistryKey reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run\", true);
+            RegistryKey reg = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run\", true);
             if (reg.GetValue(VirtualClipBoard_Name) != null){
                 autoload.Checked = true;
                 Console.WriteLine("Приложение записано в автозагрузку. (В настройках ставим Checked = true)");
@@ -227,7 +227,7 @@ namespace VirtualClipBoard
         // Если флажок - прописываем в реестр на автозагрузку
         private void autoload_CheckedChanged(object sender, EventArgs e)
         {
-            RegistryKey reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run\", true);
+            RegistryKey reg = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run\", true);
             if (reg.GetValue(VirtualClipBoard_Name) != null)
             {
                 try
