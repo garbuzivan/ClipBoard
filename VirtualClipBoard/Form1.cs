@@ -22,8 +22,8 @@ namespace VirtualClipBoard
         String VirtualClipBoard_Name = "VirtualClipBoard"; // название программы
         public String VirtualClipBoard_TARGET; // последний значение текстового БО
         public String VirtualClipBoard_DAT; // путь к файлу истории
-        Dictionary<int, string> VirtualClipBoard_History = new Dictionary<int, string>(); // История нашего буфера
-        Dictionary<int, int> VirtualClipBoard_Index_ListBox; // список индексов в связки с ключами истории буфера
+        IDictionary<int, string> VirtualClipBoard_History = new Dictionary<int, string>(); // История нашего буфера
+        IDictionary<int, int> VirtualClipBoard_Index_ListBox; // список индексов в связки с ключами истории буфера
 
         // Подключение библиотек WIN
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
